@@ -65,12 +65,6 @@ func (parser *Parser) ParseDirectory() (Blocks, error) {
 		return nil, nil
 	}
 
-	tfPath := parser.initialPath
-	if len(subdirectories) > 0 {
-		tfPath = subdirectories[0]
-		debug.Log("Project root set to '%s'...", tfPath)
-	}
-
 	debug.Log("Loading TFVars...")
 	t = metrics.Start(metrics.DiskIO)
 	inputVars, err := LoadTFVars(parser.tfvarsPath)
@@ -81,14 +75,14 @@ func (parser *Parser) ParseDirectory() (Blocks, error) {
 
 	debug.Log("Loading module metadata...")
 	t = metrics.Start(metrics.DiskIO)
-	modulesMetadata, _ := LoadModuleMetadata(tfPath)
+	modulesMetadata, _ := LoadModuleMetadata(parser.initialPath)
 	t.Stop()
 
 	debug.Log("Loading modules...")
-	modules := LoadModules(blocks, tfPath, modulesMetadata)
+	modules := LoadModules(blocks, parser.initialPath, modulesMetadata)
 
 	debug.Log("Evaluating expressions...")
-	evaluator := NewEvaluator(tfPath, tfPath, blocks, inputVars, modulesMetadata, modules)
+	evaluator := NewEvaluator(parser.initialPath, parser.initialPath, blocks, inputVars, modulesMetadata, modules)
 	evaluatedBlocks, err := evaluator.EvaluateAll()
 	if err != nil {
 		return nil, err
