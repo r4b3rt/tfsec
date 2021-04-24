@@ -25,6 +25,15 @@ func NewAttribute(attr *hclsyntax.Attribute, ctx *hcl.EvalContext) *Attribute {
 	}
 }
 
+func (attr *Attribute) HclAttr() *hclsyntax.Attribute {
+	return attr.hclAttribute
+}
+
+func (attr *Attribute) Context() *hcl.EvalContext {
+	return attr.ctx
+}
+
+
 func (attr *Attribute) IsLiteral() bool {
 	return len(attr.hclAttribute.Expr.Variables()) == 0
 }
@@ -34,14 +43,24 @@ func (attr *Attribute) Type() cty.Type {
 }
 
 func (attr *Attribute) Value() cty.Value {
-	if attr == nil {
+	if attr == nil || attr.hclAttribute == nil || attr.hclAttribute.Expr == nil {
 		return cty.NilVal
 	}
-	ctyVal, _ := attr.hclAttribute.Expr.Value(attr.ctx)
-	if !ctyVal.IsKnown() {
-		return cty.NilVal
+	var ret cty.Value
+	getValue(attr, ret)
+	return ret
+}
+
+func getValue(attr *Attribute, v cty.Value) {
+	defer func()  {
+		if err := recover(); err != nil {
+			v = cty.NilVal
+		}
+	}()
+	v, diag := attr.hclAttribute.Expr.Value(attr.ctx)
+	if (diag != nil && diag.HasErrors()) || !v.IsKnown() {
+		v = cty.Value{}
 	}
-	return ctyVal
 }
 
 func (attr *Attribute) Range() Range {
@@ -220,6 +239,9 @@ func (attr *Attribute) IsFalse() bool {
 }
 
 func (attr *Attribute) IsEmpty() bool {
+	if attr.Value() == cty.NilVal {
+		return true
+	}
 	if attr.Value().Type() == cty.String {
 		return len(attr.Value().AsString()) == 0
 	}

@@ -2,7 +2,6 @@ package checks
 
 import (
 	"fmt"
-
 	"github.com/tfsec/tfsec/internal/app/tfsec/parser"
 	"github.com/tfsec/tfsec/internal/app/tfsec/scanner"
 )
@@ -46,7 +45,6 @@ func init() {
 
 			kmsKeyIdAttr := block.GetAttribute("kms_key_id")
 			storageEncryptedattr := block.GetAttribute("storage_encrypted")
-
 			if (kmsKeyIdAttr == nil || kmsKeyIdAttr.IsEmpty()) &&
 				(storageEncryptedattr == nil || storageEncryptedattr.IsFalse()) {
 				return []scanner.Result{
