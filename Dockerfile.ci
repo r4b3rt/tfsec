@@ -1,7 +1,14 @@
-FROM alpine:3.14
-# use a non-privileged user
-USER nobody
-# work somewhere where we can write
+FROM alpine:latest
+
+# install git
+RUN apk add --no-cache git
+
 COPY tfsec /usr/bin/tfsec
-# as we specified an entrypoint, this is appended as an argument (i.e., `tfsec --help`)
+
+## use a non-privileged user
+RUN adduser -D tfsec
+USER tfsec
+
+# as we are not specifying an entrypoint, this is the default executed command
+# that you could override
 CMD [ "tfsec", "--help" ]

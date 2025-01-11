@@ -1,21 +1,56 @@
 <p align="center">
-  <img width="354" src="./tfsec.png">
+  <img width="354" src=".github/images/tfsec_worded.png">
 </p>
 
 [![GoReportCard](https://goreportcard.com/badge/github.com/aquasecurity/tfsec)](https://goreportcard.com/report/github.com/aquasecurity/tfsec)
-[![Join Our Slack](https://img.shields.io/badge/Slack-Join-green)](https://join.slack.com/t/tfsec/shared_invite/zt-o6c7mgoj-eJ1sLDv595sKiP5OPoHJww)
+[![Join Our Slack](https://img.shields.io/badge/Slack-Join-green)](https://slack.aquasec.com/)
 [![Docker Build](https://img.shields.io/docker/v/tfsec/tfsec?label=docker)](https://hub.docker.com/r/tfsec/tfsec)
 [![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/tfsec.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/tfsec)
 [![Chocolatey](https://img.shields.io/chocolatey/v/tfsec)](https://chocolatey.org/packages/tfsec)
-[![AUR version](https://img.shields.io/aur/version/tfsec)](https://aur.archlinux.org/packages/tfsec)
+[![AUR version](https://img.shields.io/aur/version/tfsec-bin)](https://aur.archlinux.org/packages/tfsec-bin)
 [![VScode Extension](https://img.shields.io/visual-studio-marketplace/v/tfsec.tfsec?label=vscode)](https://marketplace.visualstudio.com/items?itemName=tfsec.tfsec)
 
-tfsec uses static analysis of your terraform templates to spot potential
-security issues. Now with terraform CDK support.
+## 📣 tfsec to Trivy Migration
 
-## Aqua and tfsec
+As part of our goal to provide a comprehensive open source security solution for all, we have been consolidating all of our scanning-related efforts in one place, and that is [Trivy](https://github.com/aquasecurity/trivy). 
 
-Great news - tfsec has [now joined Aqua Security](https://www.aquasec.com/news/aqua-security-acquires-tfsec/). Not only will the project remain open source, it now has a lot more resource and expertise behind it. Expect great new features and many more checks very soon...
+Over the past year, tfsec has laid the foundations to Trivy's IaC & misconfigurations scanning capabilities, including Terraform scanning, which has been natively supported in Trivy for a long time now.
+
+Going forward we want to encourage the tfsec community to transition over to Trivy. Moving to Trivy gives you the same excellent Terraform scanning engine, with some extra benefits:
+
+1. Access to more languages and features in the same tool.
+2. Access to more integrations with tools and services through the rich ecosystem around Trivy.
+3. Commercially supported by Aqua as well as by a the passionate Trivy community.
+tfsec will continue to remain available for the time being, although our engineering attention will be directed at Trivy going forward.
+
+## tfsec to Trivy migration guide
+
+For further information on how Trivy compares to tfsec and moving from tfsec to Trivy, do have a look at the [migration guide.](https://github.com/aquasecurity/tfsec/blob/master/tfsec-to-trivy-migration-guide.md)
+
+## Overview
+tfsec uses static analysis of your terraform code to spot potential misconfigurations.
+
+### Features
+
+- :cloud: Checks for misconfigurations across all major (and some minor) cloud providers
+- :no_entry: Hundreds of built-in rules
+- :nesting_dolls: Scans modules (local and remote)
+- :heavy_plus_sign: Evaluates HCL expressions as well as literal values
+- :arrow_right_hook: Evaluates Terraform functions e.g. `concat()`
+- :link: Evaluates relationships between Terraform resources
+- :toolbox: Compatible with the Terraform CDK
+- :no_good: Applies (and embellishes) user-defined Rego policies
+- :page_with_curl: Supports multiple output formats: lovely (default), JSON, SARIF, CSV, CheckStyle, JUnit, text, Gif.
+- :hammer_and_wrench: Configurable (via CLI flags and/or config file)
+- :zap: Very fast, capable of quickly scanning huge repositories
+- :electric_plug: Plugins for popular IDEs available ([JetBrains](https://plugins.jetbrains.com/plugin/18687-tfsec-findings-explorer), [VSCode](https://marketplace.visualstudio.com/items?itemName=tfsec.tfsec) and [Vim](https://github.com/aquasecurity/vim-tfsec))
+- :house_with_garden: Community-driven - come and chat with us [on Slack](https://slack.aquasec.com/)!
+
+## Recommended by Thoughtworks
+
+Rated _Adopt_ by the [Thoughtworks Tech Radar](https://www.thoughtworks.com/en-gb/radar/tools/tfsec):
+
+> For our projects using Terraform, tfsec has quickly become a default static analysis tool to detect potential security risks. It's easy to integrate into a CI pipeline and has a growing library of checks against all of the major cloud providers and platforms like Kubernetes. Given its ease of use, we believe tfsec could be a good addition to any Terraform project.
 
 ## Example Output
 
@@ -40,6 +75,11 @@ Install with [Scoop](https://scoop.sh/)
 ```cmd
 scoop install tfsec
 ```
+Bash script (Linux):
+
+```console
+curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+```
 
 You can also grab the binary for your system from the [releases page](https://github.com/aquasecurity/tfsec/releases).
 
@@ -53,7 +93,7 @@ Please note that using `go install` will install directly from the `master` bran
 
 ### Signing
 
-The binaries on the [releases page](https://github.com/aquasecurity/tfsec/releases) are signed with the tfsec signing key `D66B222A3EA4C25D5D1A097FC34ACEFB46EC39CE` 
+The binaries on the [releases page](https://github.com/aquasecurity/tfsec/releases) are signed with the tfsec signing key `D66B222A3EA4C25D5D1A097FC34ACEFB46EC39CE`
 
 Form more information check the [signing page](SIGNING.md) for instructions on verification.
 
@@ -94,25 +134,19 @@ A Visual Studio Code extension is being developed to integrate with tfsec result
 
 If you want to run tfsec on your repository as a GitHub Action, you can use [https://github.com/aquasecurity/tfsec-pr-commenter-action](https://github.com/aquasecurity/tfsec-pr-commenter-action).
 
-## Features
+## Use as an Azure DevOps Pipelines Task
 
-- Checks for sensitive data inclusion across all providers
-- Checks for violations of best practice recommendations across all major cloud providers
-- Scans modules (currently only local modules are supported)
-- Evaluates expressions as well as literal values
-- Evaluates Terraform functions e.g. `concat()`
+You can now install the [official tfsec task](https://marketplace.visualstudio.com/items?itemName=AquaSecurityOfficial.tfsec-official). Please raise any issues/feature requests on the [task repository](https://github.com/aquasecurity/tfsec-azure-pipelines-task).
 
 ## Ignoring Warnings
 
 You may wish to ignore some warnings. If you'd like to do so, you can
 simply add a comment containing `tfsec:ignore:<rule>` to the offending
-line in your templates. If the problem refers to a block of code, such
-as a multiline string, you can add the comment on the line above the
-block, by itself.
+line in your templates. Alternatively, you can add the comment to the line above the block containing the issue, or to the module block to ignore all occurrences of an issue inside the module.
 
 For example, to ignore an open security group rule:
 
-```hcl
+```terraform
 resource "aws_security_group_rule" "my-rule" {
     type = "ingress"
     cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-ingress-sgr
@@ -121,7 +155,7 @@ resource "aws_security_group_rule" "my-rule" {
 
 ...or...
 
-```hcl
+```terraform
 resource "aws_security_group_rule" "my-rule" {
     type = "ingress"
     #tfsec:ignore:aws-vpc-no-public-ingress-sgr
@@ -134,7 +168,7 @@ tfsec output for the line number of the discovered problem.
 
 You can ignore multiple rules by concatenating the rules on a single line:
 
-```hcl
+```terraform
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "my-bucket" {
   bucket = "foobar"
@@ -145,13 +179,9 @@ resource "aws_s3_bucket" "my-bucket" {
 ### Expiration Date
 You can set expiration date for `ignore` with `yyyy-mm-dd` format. This is a useful feature when you want to ensure ignored issue won't be forgotten and should be revisited in the future.
 ```
-#tfsec:ignore:aws-s3-enable-bucket-encryption:exp:2022-01-02
+#tfsec:ignore:aws-s3-enable-bucket-encryption:exp:2025-01-02
 ```
-Ignore like this will be active only till `2022-01-02`, after this date it will be deactivated.
-
-### Recent Ignore Changes
-
-As of `v0.52.0`, we fixed an issue where ignores were being incorrectly applied to entire blocks. This has made it more important that ignore comments are added to the correct line(s) in your templates. If tfsec mentions a particular line number as containing an issue you want to ignore, you should add the comment on that same line, or by itself on the line above it (or above the entire block to ignore all issues of that type in the block). If tfsec mentions an entire block as being the issue, you should add a comment on the line above the first line of the block.
+Ignore like this will be active only till `2025-01-02`, after this date it will be deactivated.
 
 ## Disable checks
 
@@ -168,15 +198,19 @@ You can include values from a tfvars file in the scan,  using, for example: `--t
 
 ## Included Checks
 
-Checks are currently limited to AWS/Azure/GCP resources, but
-there are also checks which are provider agnostic.
+tfsec supports many popular cloud and platform providers
 
-| Checks |
-|:---|
-|[AWS Checks](https://www.tfsec.dev/docs/aws/home/)|
-|[Azure Checks](https://www.tfsec.dev/docs/azure/home/)|
-|[GCP Checks](https://www.tfsec.dev/docs/google/home/)|
-|[General Checks](https://www.tfsec.dev/docs/general/home/)|
+| Checks                                                                                  |
+|:----------------------------------------------------------------------------------------|
+| [AWS Checks](https://aquasecurity.github.io/tfsec/latest/checks/aws/)                   |
+| [Azure Checks](https://aquasecurity.github.io/tfsec/latest/checks/azure/)               |
+| [GCP Checks](https://aquasecurity.github.io/tfsec/latest/checks/google/)                |
+| [CloudStack Checks](https://aquasecurity.github.io/tfsec/latest/checks/cloudstack/)     |
+| [DigitalOcean Checks](https://aquasecurity.github.io/tfsec/latest/checks/digitalocean/) |
+| [GitHub Checks](https://aquasecurity.github.io/tfsec/latest/checks/github/)             |
+| [Kubernetes Checks](https://aquasecurity.github.io/tfsec/latest/checks/kubernetes/)     |
+| [OpenStack Checks](https://aquasecurity.github.io/tfsec/latest/checks/openstack/)       |
+| [Oracle Checks](https://aquasecurity.github.io/tfsec/latest/checks/oracle/)             |
 
 ## Running in CI
 
@@ -185,21 +219,21 @@ output. You can do this using `--no-colour` (or `--no-color` for our American fr
 
 ## Output options
 
-You can output tfsec results as JSON, CSV, Checkstyle, Sarif, JUnit or just plain old human readable format. Use the `--format` flag
+You can output tfsec results as JSON, CSV, Checkstyle, Sarif, JUnit or just plain old human-readable format. Use the `--format` flag
 to specify your desired format.
 
-## Github Security Alerts
+## GitHub Security Alerts
 If you want to integrate with Github Security alerts and include the output of your tfsec checks you can use the [tfsec-sarif-action](https://github.com/marketplace/actions/run-tfsec-with-sarif-upload) Github action to run the static analysis then upload the results to the security alerts tab.
 
 The alerts generated for [tfsec-example-project](https://github.com/tfsec/tfsec-example-project) look like this.
 
 ![github security alerts](codescanning.png)
 
-When you click through the alerts for the branch, you get more information about the actual issue. 
+When you click through the alerts for the branch, you get more information about the actual issue.
 
 ![github security alerts](scanningalert.png)
 
-For more information about adding security alerts, check 
+For more information about adding security alerts, check [the GitHub documentation](https://docs.github.com/en/code-security/repository-security-advisories/about-github-security-advisories-for-repositories)
 
 ## Support for older terraform versions
 
@@ -218,3 +252,7 @@ We always welcome contributions; big or small, it can be documentation updates, 
 </a>
 
 Made with [contributors-img](https://contrib.rocks).
+
+`tfsec` is an [Aqua Security](https://aquasec.com) open source project.
+Learn about our open source work and portfolio [here](https://www.aquasec.com/products/open-source-projects/).
+Join the community, and talk to us about any matter in [GitHub Discussion](https://github.com/aquasecurity/tfsec/discussions) or [Slack](https://slack.aquasec.com).

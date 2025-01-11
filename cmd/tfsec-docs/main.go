@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
-	"github.com/aquasecurity/tfsec/pkg/rule"
+	"github.com/aquasecurity/defsec/pkg/rules"
 
 	"github.com/spf13/cobra"
-
-	_ "github.com/aquasecurity/tfsec/internal/app/tfsec/rules"
-	"github.com/aquasecurity/tfsec/internal/app/tfsec/scanner"
 )
 
 var (
@@ -20,12 +18,12 @@ var (
 
 type FileContent struct {
 	Provider string
-	Checks   []rule.Rule
+	Checks   []templateObject
 }
 
 func init() {
-	defaultWebDocsPath := fmt.Sprintf("%s/checkdocs", projectRoot)
-	rootCmd.Flags().StringVar(&webPath, "web-path", defaultWebDocsPath, "The path to generate web into, defaults to ./checkdocs")
+	defaultWebDocsPath := fmt.Sprintf("%s/docs/checks", projectRoot)
+	rootCmd.Flags().StringVar(&webPath, "web-path", defaultWebDocsPath, "The path to generate web into, defaults to ./docs/checks")
 }
 
 func main() {
@@ -39,29 +37,40 @@ var rootCmd = &cobra.Command{
 	Use:   "tfsec-docs",
 	Short: "tfsec-docs generates documentation for the checks in tfsec",
 	Long:  `tfsec-docs generates the content for the root README and also can generate the missing base pages for the wiki`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 
 		fileContents := getSortedFileContents()
-		if err := generateChecksFiles(fileContents); err != nil {
+		if err := generateWebPages(fileContents); err != nil {
 			return err
 		}
 
-		if err := generateExtensionCodeFile(fileContents); err != nil {
-			return err
-		}
-
-		return generateWebPages(fileContents)
+		return generateIndexPages(fileContents)
 	},
 }
 
 func getSortedFileContents() []*FileContent {
-	rules := scanner.GetRegisteredRules()
 
-	checkMap := make(map[string][]rule.Rule)
+	checkMap := make(map[string][]templateObject)
 
-	for _, r := range rules {
-		provider := string(r.Provider)
-		checkMap[provider] = append(checkMap[provider], r)
+	for _, r := range rules.GetRegistered() {
+		if r.Rule().Terraform == nil {
+			continue
+		}
+		provider := string(r.Rule().Provider)
+		checkMap[provider] = append(checkMap[provider], templateObject{
+			ID:          r.Rule().LongID(),
+			ShortCode:   r.Rule().ShortCode,
+			Severity:    strings.ToLower(string(r.Rule().Severity)),
+			Service:     r.Rule().Service,
+			Provider:    string(r.Rule().Provider),
+			Summary:     r.Rule().Summary,
+			Explanation: r.Rule().Explanation,
+			Impact:      r.Rule().Impact,
+			Resolution:  r.Rule().Resolution,
+			BadExample:  r.Rule().Terraform.BadExamples[0],
+			GoodExample: r.Rule().Terraform.GoodExamples[0],
+			Links:       append(r.Rule().Terraform.Links, r.Rule().Links...),
+		})
 	}
 
 	var fileContents []*FileContent
@@ -73,12 +82,11 @@ func getSortedFileContents() []*FileContent {
 			Checks:   checks,
 		})
 	}
-	generateNavIndexFile(fileContents)
 	return fileContents
 }
 
-func sortChecks(checks []rule.Rule) {
+func sortChecks(checks []templateObject) {
 	sort.Slice(checks, func(i, j int) bool {
-		return checks[i].ID() < checks[j].ID()
+		return checks[i].ID < checks[j].ID
 	})
 }
